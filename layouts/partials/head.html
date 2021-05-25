@@ -9,13 +9,24 @@
     <style>
      article pre { overflow-x: scroll }
      a { text-decoration: none }
+     ul li { list-style-type: none }
+     .entry li>a { display: block; padding: 3px 0 }
      .container { max-width: 960px; margin: 0 auto }
      .material-icons { font-size: .9em }
      .breadcrumb>li { display: inline }
      .breadcrumb>li:not(:last-child)::after { content: '/'; padding: 0 8px }
+     .hljs-ln-numbers {
+         text-align: right;
+     }
+     .hljs-ln td.hljs-ln-code {
+         padding: 0 1em;
+     }
      {{- if eq $color_scheme "dark" }}
      body { background-color: black; color: white }
      a { color: lightblue }
+     li>a:hover { background: #222 }
+     {{- else }}
+     li>a:hover { background: #eee }
      {{- end }}
     </style>
     <title>{{ if not .IsHome }}{{ .Title }} | {{ end }}{{ .Site.Title }}</title>
