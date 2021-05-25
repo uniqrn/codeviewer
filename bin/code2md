@@ -1,0 +1,58 @@
+#!/bin/bash
+
+prepare_dir () {
+  subdir_list=`cd $1; find . -type d | sed 's!^.[^/]*/!!'`
+  for d in $subdir_list; do
+      dir_name=`basename $d`
+      if [ -n "$VERBOSE" ]; then
+          echo "Entering $2/$d" 1>&2
+      fi
+    mkdir -p $2/$d
+
+    # generate section list
+    echo -e "---\ntitle: $dir_name\n---" > $2/$d/_index.md
+  done
+}
+
+code2md () {
+  file_list=`cd $1; find . -type f`
+  for f in $file_list; do
+    file_name=`basename $f`
+    if [ -n "$VERBOSE" ]; then
+        echo "Generating $2/$f" 1>&2
+    fi
+    if [ ${file_name##*.} = 'md' ]; then
+      cp $1/$f $2/$f
+    else
+      echo -e "---\ntitle: $file_name\n---" > $2/$f.md
+      echo '```'"${file_name##*.}" >> $2/$f.md
+      cat $1/$f >> $2/$f.md
+      echo '```' >> $2/$f.md
+    fi
+  done
+}
+
+usage () {
+    echo "Usage: code2md [-v] origin_dir dest_dir" 1>&2
+    exit 1
+}
+
+while getopts v:h OPT
+do
+    case $OPT in
+      v) VERBOSE=1
+         ;;
+      h) usage
+         ;;
+    esac
+    shift
+done
+
+if [ $# -lt 2 ]; then
+    usage
+fi
+
+prepare_dir $1 $2
+code2md $1 $2
+
+
