@@ -11,6 +11,8 @@
      a { text-decoration: none }
      .container { max-width: 960px; margin: 0 auto }
      .material-icons { font-size: .9em }
+     .breadcrumb>li { display: inline }
+     .breadcrumb>li:not(:last-child)::after { content: '/'; padding: 0 8px }
      {{- if eq $color_scheme "dark" }}
      body { background-color: black; color: white }
      a { color: lightblue }
