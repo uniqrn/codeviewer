@@ -29,7 +29,7 @@ code2md () {
       echo -e "---\ntitle: $file_name\n---" > $2/$f.md
       echo '```'"${file_name##*.}" >> $2/$f.md
       cat $1/$f >> $2/$f.md
-      echo '```' >> $2/$f.md
+      echo -e '\n```' >> $2/$f.md
     fi
   done
 }
