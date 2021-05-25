@@ -1,7 +1,7 @@
 #!/bin/bash
 
 prepare_dir () {
-  subdir_list=`cd $1; find . -type d | sed 's!^.[^/]*/!!'`
+    subdir_list=`cd $1; find . -type d | sed 's!^.[^/]*/!!'`
   for d in $subdir_list; do
       dir_name=`basename $d`
       if [ -n "$VERBOSE" ]; then
@@ -12,6 +12,8 @@ prepare_dir () {
     # generate section list
     echo -e "---\ntitle: $dir_name\n---" > $2/$d/_index.md
   done
+  # override top page
+  echo -e "---\ntitle: $(basename $1)\n---" > $2/_index.md
 }
 
 code2md () {
