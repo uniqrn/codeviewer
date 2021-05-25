@@ -1,3 +1,20 @@
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@latest/styles/default.css" />
+    <meta charset="utf-8">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel='preload' href='//fonts.googleapis.com/icon?family=Material+Icons' as='style' onload='this.onload=null;this.rel="stylesheet"'>
+    {{- $color_scheme := .Site.Params.color_scheme | default "dark" }}
+    {{- $highlight_theme := .Site.Params.highlight_theme | default (printf "atom-one-%s" $color_scheme) }}
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@latest/build/styles/{{ $highlight_theme }}.min.css" />
+    <style>
+     article pre { overflow-x: scroll }
+     a { text-decoration: none }
+     .container { max-width: 960px; margin: 0 auto }
+     .material-icons { font-size: .9em }
+     {{- if eq $color_scheme "dark" }}
+     body { background-color: black; color: white }
+     a { color: lightblue }
+     {{- end }}
+    </style>
+    <title>{{ if not .IsHome }}{{ .Title }} | {{ end }}{{ .Site.Title }}</title>
 </head>

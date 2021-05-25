@@ -1,2 +1,11 @@
 {{ define "main" }}
+{{- with .Content }}
+{{- end }}
+{{- range .Sections }}
+<div><a href="{{ .RelPermalink }}"><i class="material-icons">folder</i> {{ .Title }}</a></div>
+{{- end }}
+<br />
+{{- range .RegularPages }}
+<div><a href="{{ .RelPermalink }}"><i class="material-icons">code</i> {{ .Title }}</a></div>
+{{- end }}
 {{ end }}
