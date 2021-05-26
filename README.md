@@ -4,9 +4,15 @@
 
 ## Settings
 
-You can customize look and feel with `config.toml` site settings.
+Hugo has its own [Highlight](https://gohugo.io/getting-started/configuration-markup#highlight) feature enabled by default.
+It conflicts with highlight.js. You can disable hugo's highlight with `config.toml` site settings.
+
+You can also customize highlight.js look and feel in `Params` section.
 
 ```toml
+[markup.highlight]
+codeFences = false                 # disable Hugo highlighting with Chroma
+
 [Params]
 color_scheme = "light"             # dark(default) | light
 highlight_theme = "atom-one-dark"  # highlightjs theme name
