@@ -1,60 +1,69 @@
 #!/bin/bash
 
 prepare_dir () {
-    subdir_list=`cd $1; find . -type d | sed 's!^.[^/]*/!!'`
-  for d in $subdir_list; do
-      dir_name=`basename $d`
-      if [ -n "$VERBOSE" ]; then
-          echo "Entering $2/$d" 1>&2
-      fi
-    mkdir -p $2/$d
+  dest=`echo "$2/$1" | sed 's!/\+!/!g' | sed 's!/$!!'`
+  if [ ! -d $dest ]; then
+    dir_name=`basename $1`
+    if [ -n "$VERBOSE" ]; then
+        echo "Entering $dest" 1>&2
+    fi
+    mkdir -p $dest
 
     # generate section list
-    echo -e "---\ntitle: $dir_name\n---" > $2/$d/_index.md
+    echo -e "---\ntitle: $dir_name\n---" > $dest/_index.md
+  fi
+}
+
+code2md () {
+  file_list=`cd $1; git ls-files | $EXCLUDE_CMD`
+  for f in $file_list; do
+    prepare_dir `dirname $f` $2
+    dest_file=`echo "$2/$f" | sed 's!/\+!/!g'`
+    file_name=`basename $f`
+    if [ -n "$VERBOSE" ]; then
+        echo "Generating $dest_file.md" 1>&2
+    fi
+    if [ ${file_name##*.} = 'md' ]; then
+      cp $1/$f $dest_file
+    else
+      echo -e "---\ntitle: $file_name\n---" > $dest_file.md
+      echo '```'"${file_name##*.}" >> $dest_file.md
+      cat $1/$f >> $dest_file.md
+      echo -e '\n```' >> $dest_file.md
+    fi
   done
+
   # override top page
   echo -e "---\ntitle: $(basename $1)\n---" > $2/_index.md
 }
 
-code2md () {
-  file_list=`cd $1; find . -type f`
-  for f in $file_list; do
-    file_name=`basename $f`
-    if [ -n "$VERBOSE" ]; then
-        echo "Generating $2/$f" 1>&2
-    fi
-    if [ ${file_name##*.} = 'md' ]; then
-      cp $1/$f $2/$f
-    else
-      echo -e "---\ntitle: $file_name\n---" > $2/$f.md
-      echo '```'"${file_name##*.}" >> $2/$f.md
-      cat $1/$f >> $2/$f.md
-      echo -e '\n```' >> $2/$f.md
-    fi
-  done
-}
-
 usage () {
-    echo "Usage: code2md [-v] origin_dir dest_dir" 1>&2
-    exit 1
+  cat <<- 'EOS' 1>&2
+	usage: code2md [-v] [-x suffix] origin_dir dest_dir
+
+	       -v             verbose
+	       -x <suffix>    exclude files with backward match.
+	EOS
+  exit 1
 }
 
-while getopts v:h OPT
+EXCLUDE_CMD=cat
+while getopts "vx:h" OPT
 do
     case $OPT in
       v) VERBOSE=1
          ;;
+      x) EXCLUDE_CMD=" grep -v $OPTARG$"
+         ;;
       h) usage
          ;;
     esac
-    shift
 done
+shift $((OPTIND - 1))
 
+# requires orign & dest dir
 if [ $# -lt 2 ]; then
     usage
 fi
 
-prepare_dir $1 $2
 code2md $1 $2
-
-
