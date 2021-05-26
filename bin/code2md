@@ -24,7 +24,13 @@ code2md () {
         echo "Generating $dest_file.md" 1>&2
     fi
     if [ ${file_name##*.} = 'md' ]; then
-      cp $1/$f $dest_file
+      echo '' > $dest_file
+      head -1 $1/$f | grep '\-\-\-' > /dev/null
+      if [ $? -eq 1 ]; then
+          # add front matter
+          echo -e "---\ntitle: $file_name\n---" > $dest_file
+      fi
+      cat $1/$f >> $dest_file
     else
       echo -e "---\ntitle: $file_name\n---" > $dest_file.md
       echo '```'"${file_name##*.}" >> $dest_file.md
