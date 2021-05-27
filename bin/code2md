@@ -14,6 +14,17 @@ prepare_dir () {
   fi
 }
 
+identify_language () {
+    LANGUAGE=${1##*.}
+    if [[ $LANGUAGE =~ [Dd]ockerfile ]]; then
+        LANGUAGE=docker
+    elif [[ $LANGUAGE =~ [Jj]enkinsfile ]]; then
+        LANGUAGE=groovy
+    elif [[ $LANGUAGE =~ proto ]]; then
+        LANGUAGE=protobuf
+    fi
+}
+
 code2md () {
   file_list=`cd $1; git ls-files | $EXCLUDE_CMD`
   for f in $file_list; do
@@ -32,8 +43,9 @@ code2md () {
       fi
       cat $1/$f >> $dest_file
     else
+      identify_language $file_name
       echo -e "---\ntitle: $file_name\n---" > $dest_file.md
-      echo '```'"${file_name##*.}" >> $dest_file.md
+      echo '```'"$LANGUAGE" >> $dest_file.md
       cat $1/$f >> $dest_file.md
       echo -e '\n```' >> $dest_file.md
     fi
