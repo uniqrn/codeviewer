@@ -54,6 +54,9 @@ code2md () {
   # override top page
   project=`basename $(git remote -v | head -1 | awk '{print $2}' | sed 's/^.*://')`
   echo -e "---\ntitle: ${project%.git}\n---" > $2/_index.md
+  if [ -n "$ROOT_DOC" ]; then
+      cat $ROOT_DOC >> $2/_index.md
+  fi
 }
 
 usage () {
@@ -61,6 +64,7 @@ usage () {
 	usage: code2md [<options>] <outpur_dir>
 
 	       -d <sub_dir>   root directory under git repository
+	       -m <doc_file>  markdown document for top page. Relative path from repo top dir.
 	       -v             verbose
 	       -x <suffix>    exclude files with backward match.
 	EOS
@@ -68,12 +72,14 @@ usage () {
 }
 
 EXCLUDE_CMD=cat
-while getopts "vd:x:h" OPT
+while getopts "vd:m:x:h" OPT
 do
     case $OPT in
       v) VERBOSE=1
          ;;
       d) SUB_DIR=$OPTARG
+         ;;
+      m) ROOT_DOC=$OPTARG
          ;;
       x) EXCLUDE_CMD=" grep -v $OPTARG$"
          ;;
@@ -87,6 +93,13 @@ ORIGIN=$(git rev-parse --show-cdup)
 if [ $? -ne 0 ]; then
     echo "Not a git repository. Exit"
     exit 1
+fi
+if [ -n "$ROOT_DOC" ]; then
+    ROOT_DOC=./$ORIGIN/$ROOT_DOC
+    if [ ! -f $ROOT_DOC ]; then
+        echo "No file for -m option exists."
+        exit 1
+    fi
 fi
 ORIGIN=./$ORIGIN$SUB_DIR
 

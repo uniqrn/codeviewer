@@ -1,6 +1,4 @@
 {{ define "main" }}
-{{- with .Content }}
-{{- end }}
 <ul class="entry">
 {{- if not .IsHome }}
   <li><a href="../"><i class="material-icons">folder</i> ..</a></li>
@@ -14,4 +12,9 @@
 <li><a href="{{ .RelPermalink }}"><i class="material-icons">code</i> {{ .Title }}</a></li>
 {{- end }}
 </ul>
+{{- with .Content }}
+<article>
+    {{ . }}
+</article>
+{{- end }}
 {{ end }}
