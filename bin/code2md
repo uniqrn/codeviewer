@@ -22,6 +22,8 @@ identify_language () {
         LANGUAGE=groovy
     elif [[ $LANGUAGE =~ proto ]]; then
         LANGUAGE=protobuf
+    elif [[ $LANGUAGE =~ Gemfile ]]; then
+        LANGUAGE=ruby
     fi
 }
 
