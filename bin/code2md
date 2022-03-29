@@ -3,14 +3,10 @@
 prepare_dir () {
   dest=`echo "$2/$1" | sed 's!/\+!/!g' | sed 's!/$!!'`
   if [ ! -d $dest ]; then
-    dir_name=`basename $1`
     if [ -n "$VERBOSE" ]; then
         echo "Entering $dest" 1>&2
     fi
     mkdir -p $dest
-
-    # generate section list
-    echo -e "---\ntitle: $dir_name\n---" > $dest/_index.md
   fi
 }
 
@@ -53,6 +49,10 @@ code2md () {
     fi
   done
 
+  for d in $(find $2 -type d); do
+    # generate section list
+    echo -e "---\ntitle: $(basename $d)\n---" > $d/_index.md
+  done
   # override top page
   project=`basename $(git remote -v | head -1 | awk '{print $2}' | sed 's/^.*://')`
   echo -e "---\ntitle: ${project%.git}\n---" > $2/_index.md
