@@ -27,8 +27,12 @@ code2md () {
   file_list=`cd $1; git ls-files | grep -v 'themes/codeviewer' | $EXCLUDE_CMD`
   for f in $file_list; do
     prepare_dir `dirname $f` $2
-    dest_file=`echo "$2/$f" | sed 's!/\+!/!g'`
     file_name=`basename $f`
+    if [[ ${file_name%%.*} =~ ^_*index$ ]]; then
+	    dest_file=`echo "$2/$(dirname $f)/00-$file_name" | sed 's!/\+!/!g'`
+    else
+	    dest_file=`echo "$2/$f" | sed 's!/\+!/!g'`
+    fi
     if [ -n "$VERBOSE" ]; then
         echo "Generating $dest_file.md" 1>&2
     fi
@@ -99,7 +103,7 @@ fi
 if [ -n "$ROOT_DOC" ]; then
     ROOT_DOC=./$ORIGIN/$ROOT_DOC
     if [ ! -f $ROOT_DOC ]; then
-        echo "No file for -m option exists."
+        echo "No file exists specified with -m option."
         exit 1
     fi
 fi
