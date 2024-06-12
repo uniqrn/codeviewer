@@ -44,7 +44,7 @@ code2md () {
           echo -e "---\ntitle: $file_name\n---" > $dest_file
       fi
       cat $1/$f >> $dest_file
-    else
+    elif [ -f "$1/$f" ]; then
       identify_language $file_name
       echo -e "---\ntitle: $file_name\n---" > $dest_file.md
       echo '```'"$LANGUAGE" >> $dest_file.md
