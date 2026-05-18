@@ -12,15 +12,38 @@ prepare_dir () {
 
 identify_language () {
     shopt -s nocasematch
-    LANGUAGE=${1##*.}
-    if [[ $LANGUAGE =~ containerfile|dockerfile ]]; then
+    LANGUAGE=""
+    if [[ $1 =~ ^cargo\.lock$ ]]; then
+        LANGUAGE=ini
+    elif [[ $1 =~ ^deno\.lock$ ]]; then
+        LANGUAGE=json
+    fi
+    if [[ -n "$LANGUAGE" ]]; then
+	    return
+    fi
+
+    LANGUAGE=${1#*.}
+    if [[ $LANGUAGE =~ plpg\. ]]; then
+        LANGUAGE=pgsql
+    elif [[ $LANGUAGE =~ erb\. ]]; then
+        LANGUAGE=erb
+    else
+      LANGUAGE=${1##*.}
+      if [[ $LANGUAGE =~ containerfile|dockerfile ]]; then
         LANGUAGE=docker
-    elif [[ $LANGUAGE =~ jenkinsfile ]]; then
+      elif [[ $LANGUAGE =~ jenkinsfile ]]; then
         LANGUAGE=groovy
-    elif [[ $LANGUAGE =~ proto ]]; then
+      elif [[ $LANGUAGE =~ proto ]]; then
         LANGUAGE=protobuf
-    elif [[ $LANGUAGE =~ gemfile ]]; then
+      elif [[ $LANGUAGE =~ gemfile ]]; then
         LANGUAGE=ruby
+      elif [[ $LANGUAGE =~ cue$ ]]; then
+        LANGUAGE=javascript
+      elif [[ $LANGUAGE =~ mjml$ ]]; then
+        LANGUAGE=html
+      elif [[ $LANGUAGE =~ stpl$ ]]; then
+        LANGUAGE=erb
+      fi
     fi
     shopt -u nocasematch
 }
