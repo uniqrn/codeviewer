@@ -67,14 +67,14 @@ code2md () {
       if [ $? -eq 1 ]; then
           # add front matter
           echo -e "---\ntitle: $file_name" > $dest_file
-          git log -n 1 --pretty=format:'date: %ai%ncommit: %h%nmessage: "%s"' $f >> $dest_file
+          git log -n 1 --pretty=format:'date: %ai%ncommit: %h%nmessage: "%s"' $ORIGIN/$f >> $dest_file
           echo -e "\n---" >> $dest_file
       fi
       cat $1/$f >> $dest_file
     elif [ -f "$1/$f" ]; then
       identify_language $file_name
       echo -e "---\ntitle: $file_name" > $dest_file.md
-      git log -n 1 --pretty=format:'date: %ai%ncommit: %h%nmessage: "%s"' $f >> $dest_file.md
+      git log -n 1 --pretty=format:'date: %ai%ncommit: %h%nmessage: "%s"' $ORIGIN/$f >> $dest_file.md
       echo -e "\n---" >> $dest_file.md
 
       echo '```'"$LANGUAGE" >> $dest_file.md
@@ -88,7 +88,7 @@ code2md () {
     DIR=$(basename $d)
     ORIGIN_DIR=$(echo $d | sed "s!$2/*!!")
     echo -e "---\ntitle: $DIR" > $d/_index.md
-    git log -n 1 --pretty=format:'date: %ai%ncommit: %h%nmessage: "%s"' $ORIGIN_DIR >> $d/_index.md
+    git log -n 1 --pretty=format:'date: %ai%ncommit: %h%nmessage: "%s"' $ORIGIN/$ORIGIN_DIR >> $d/_index.md
     echo -e "\n---" >> $d/_index.md
   done
   # override top page
@@ -141,7 +141,7 @@ if [ -n "$ROOT_DOC" ]; then
         exit 1
     fi
 fi
-ORIGIN=./$ORIGIN$SUB_DIR
+ORIGIN=${ORIGIN:-./}$SUB_DIR
 
 # requires orign & dest dir
 if [ $# -lt 1 ]; then
