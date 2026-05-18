@@ -11,16 +11,18 @@ prepare_dir () {
 }
 
 identify_language () {
+    shopt -s nocasematch
     LANGUAGE=${1##*.}
-    if [[ $LANGUAGE =~ [Dd]ockerfile ]]; then
+    if [[ $LANGUAGE =~ containerfile|dockerfile ]]; then
         LANGUAGE=docker
-    elif [[ $LANGUAGE =~ [Jj]enkinsfile ]]; then
+    elif [[ $LANGUAGE =~ jenkinsfile ]]; then
         LANGUAGE=groovy
     elif [[ $LANGUAGE =~ proto ]]; then
         LANGUAGE=protobuf
-    elif [[ $LANGUAGE =~ Gemfile ]]; then
+    elif [[ $LANGUAGE =~ gemfile ]]; then
         LANGUAGE=ruby
     fi
+    shopt -u nocasematch
 }
 
 code2md () {
