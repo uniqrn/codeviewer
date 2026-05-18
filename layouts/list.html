@@ -4,12 +4,12 @@
   <li><a href="../"><i class="material-icons">folder</i> ..</a></li>
 {{- end }}
 {{- range .Sections }}
-<li><a href="{{ .RelPermalink }}"><i class="material-icons">folder</i> {{ .Title }}</a></li>
+<li><a href="{{ .RelPermalink }}"><i class="material-icons">folder</i> {{ .Title }}</a> <span>{{ .Params.message | truncate 20 }}</span><span>{{ .Date | time.Format ":date_short" }}</span></li>
 {{- end }}
 </ul>
 <ul class="entry">
 {{- range .RegularPages }}
-<li><a href="{{ .RelPermalink }}"><i class="material-icons">code</i> {{ .Title }}</a></li>
+<li><a href="{{ .RelPermalink }}"><i class="material-icons">code</i> {{ .Title }}</a> <span>{{ .Params.message | truncate 20 }}</span><span>{{ .Date | time.Format ":date_short" }}</span></li>
 {{- end }}
 </ul>
 {{- with .Content }}

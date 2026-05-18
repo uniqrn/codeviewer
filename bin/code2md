@@ -58,20 +58,25 @@ code2md () {
     else
 	    dest_file=`echo "$2/$f" | sed 's!/\+!/!g'`
     fi
-    if [ -n "$VERBOSE" ]; then
+    if [[ -n "$VERBOSE" ]]; then
         echo "Generating $dest_file.md" 1>&2
     fi
-    if [ ${file_name##*.} = 'md' ]; then
+    if [[ ${file_name##*.} = 'md' ]]; then
       echo '' > $dest_file
       head -1 $1/$f | grep '\-\-\-' > /dev/null
       if [ $? -eq 1 ]; then
           # add front matter
-          echo -e "---\ntitle: $file_name\n---" > $dest_file
+          echo -e "---\ntitle: $file_name" > $dest_file
+          git log -n 1 --pretty=format:'date: %ai%ncommit: %h%nmessage: "%s"' $f >> $dest_file
+          echo -e "\n---" >> $dest_file
       fi
       cat $1/$f >> $dest_file
     elif [ -f "$1/$f" ]; then
       identify_language $file_name
-      echo -e "---\ntitle: $file_name\n---" > $dest_file.md
+      echo -e "---\ntitle: $file_name" > $dest_file.md
+      git log -n 1 --pretty=format:'date: %ai%ncommit: %h%nmessage: "%s"' $f >> $dest_file.md
+      echo -e "\n---" >> $dest_file.md
+
       echo '```'"$LANGUAGE" >> $dest_file.md
       cat $1/$f >> $dest_file.md
       echo -e '\n```' >> $dest_file.md
@@ -80,7 +85,11 @@ code2md () {
 
   for d in $(find $2 -type d); do
     # generate section list
-    echo -e "---\ntitle: $(basename $d)\n---" > $d/_index.md
+    DIR=$(basename $d)
+    ORIGIN_DIR=$(echo $d | sed "s!$2/*!!")
+    echo -e "---\ntitle: $DIR" > $d/_index.md
+    git log -n 1 --pretty=format:'date: %ai%ncommit: %h%nmessage: "%s"' $ORIGIN_DIR >> $d/_index.md
+    echo -e "\n---" >> $d/_index.md
   done
   # override top page
   project=`basename $(git remote -v | head -1 | awk '{print $2}' | sed 's/^.*://')`

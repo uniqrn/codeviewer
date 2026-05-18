@@ -10,7 +10,9 @@
      article pre { overflow-x: scroll }
      a { text-decoration: none }
      ul li { list-style-type: none }
-     .entry li>a { display: block; padding: 3px 0 }
+     .entry li { display: flex; padding: 10px 0; border-bottom: solid 1px }
+     .entry li>span { padding-left: 1.6em }
+     .entry li>a { flex-grow: 1; padding: 3px 0 }
      .container { max-width: 960px; margin: 0 auto }
      .material-icons { font-size: .9em }
      .breadcrumb>li { display: inline }
@@ -25,6 +27,7 @@
      {{- if eq $color_scheme "dark" }}
      body { background-color: black; color: white }
      a { color: lightblue }
+     .entry li { border-color: #555 }
      li>a:hover { background: #222 }
      {{- else }}
      li>a:hover { background: #eee }
