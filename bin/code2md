@@ -2,11 +2,11 @@
 
 prepare_dir () {
   dest=`echo "$2/$1" | sed 's!/\+!/!g' | sed 's!/$!!'`
-  if [ ! -d $dest ]; then
+  if [ ! -d "$dest" ]; then
     if [ -n "$VERBOSE" ]; then
         echo "Entering $dest" 1>&2
     fi
-    mkdir -p $dest
+    mkdir -p "$dest"
   fi
 }
 
@@ -49,53 +49,53 @@ identify_language () {
 }
 
 code2md () {
-  file_list=`cd $1; git ls-files | grep -v 'themes/codeviewer' | $EXCLUDE_CMD`
-  for f in $file_list; do
-    prepare_dir `dirname $f` $2
-    file_name=`basename $f`
+  while IFS= read -r f; do
+    dir_name=$(dirname "$f")
+    prepare_dir "$dir_name" "$2"
+    file_name=$(basename "$f")
     if [[ ${file_name%%.*} =~ ^_*index$ ]]; then
-	    dest_file=`echo "$2/$(dirname $f)/00-$file_name" | sed 's!/\+!/!g'`
+      dest_file=`echo "$2/$dir_name/00-$file_name" | sed 's!/\+!/!g'`
     else
-	    dest_file=`echo "$2/$f" | sed 's!/\+!/!g'`
+      dest_file=`echo "$2/$f" | sed 's!/\+!/!g'`
     fi
     if [[ -n "$VERBOSE" ]]; then
         echo "Generating $dest_file.md" 1>&2
     fi
     if [[ ${file_name##*.} = 'md' ]]; then
-      echo '' > $dest_file
-      head -1 $1/$f | grep '\-\-\-' > /dev/null
+      echo '' > "$dest_file"
+      head -1 "$1/$f" | grep '\-\-\-' > /dev/null
       if [ $? -eq 1 ]; then
           # add front matter
-          echo -e "---\ntitle: $file_name" > $dest_file
-          git log -n 1 --pretty=format:'date: %ai%nparams:%n  commit: %h%n  message: "%s"' $ORIGIN/$f >> $dest_file
-          echo -e "\n---" >> $dest_file
+          echo -e "---\ntitle: $file_name" > "$dest_file"
+          git log -n 1 --pretty=format:'date: %ai%nparams:%n  commit: %h%n  message: "%s"' -- "$ORIGIN/$f" >> "$dest_file"
+          echo -e "\n---" >> "$dest_file"
       fi
-      cat $1/$f >> $dest_file
+      cat "$1/$f" >> "$dest_file"
     elif [ -f "$1/$f" ]; then
-      identify_language $file_name
-      echo -e "---\ntitle: $file_name" > $dest_file.md
-      git log -n 1 --pretty=format:'date: %ai%nparams:%n  commit: %h%n  message: "%s"' $ORIGIN/$f >> $dest_file.md
-      echo -e "\n---" >> $dest_file.md
+      identify_language "$file_name"
+      echo -e "---\ntitle: $file_name" > "$dest_file.md"
+      git log -n 1 --pretty=format:'date: %ai%nparams:%n  commit: %h%n  message: "%s"' -- "$ORIGIN/$f" >> "$dest_file.md"
+      echo -e "\n---" >> "$dest_file.md"
 
-      echo '```'"$LANGUAGE" >> $dest_file.md
-      cat $1/$f >> $dest_file.md
-      echo -e '\n```' >> $dest_file.md
+      echo '```'"$LANGUAGE" >> "$dest_file.md"
+      cat "$1/$f" >> "$dest_file.md"
+      echo -e '\n```' >> "$dest_file.md"
     fi
-  done
+  done < <(cd "$1"; git ls-files | grep -v 'themes/codeviewer' | $EXCLUDE_CMD)
 
-  for d in $(find $2 -type d); do
+  while IFS= read -r d; do
     # generate section list
-    DIR=$(basename $d)
-    ORIGIN_DIR=$(echo $d | sed "s!$2/*!!")
-    echo -e "---\ntitle: $DIR" > $d/_index.md
-    git log -n 1 --pretty=format:'date: %ai%nparams:%n  commit: %h%n  message: "%s"' $ORIGIN/$ORIGIN_DIR >> $d/_index.md
-    echo -e "\n---" >> $d/_index.md
-  done
+    DIR=$(basename "$d")
+    ORIGIN_DIR=$(echo "$d" | sed "s!$2/*!!")
+    echo -e "---\ntitle: $DIR" > "$d/_index.md"
+    git log -n 1 --pretty=format:'date: %ai%nparams:%n  commit: %h%n  message: "%s"' -- "$ORIGIN/$ORIGIN_DIR" >> "$d/_index.md"
+    echo -e "\n---" >> "$d/_index.md"
+  done < <(find "$2" -type d)
   # override top page
   project=`basename $(git remote -v | head -1 | awk '{print $2}' | sed 's/^.*://')`
-  echo -e "---\ntitle: ${project%.git}\n---" > $2/_index.md
+  echo -e "---\ntitle: ${project%.git}\n---" > "$2/_index.md"
   if [ -n "$ROOT_DOC" ]; then
-      cat $ROOT_DOC >> $2/_index.md
+      cat "$ROOT_DOC" >> "$2/_index.md"
   fi
 }
 
